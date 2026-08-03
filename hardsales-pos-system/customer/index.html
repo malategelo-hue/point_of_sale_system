@@ -7,103 +7,96 @@
     <link rel="stylesheet" href="css/customer-style.css">
 </head>
 <body>
-    <!-- Header -->
     <header class="cust-header">
         <div class="container">
             <h1>🛠 HardSales Hardware Store</h1>
             <div class="header-actions">
                 <a href="cart.html" class="cart-link">🛒 My Cart <span id="cart-count">0</span></a>
                 <a href="orders.html" class="cart-link">📋 My Orders</a>
-                <button class="theme-btn" onclick="toggleTheme()">🌙</button>
                 <a href="../index.html" class="logout-link">Logout</a>
             </div>
         </div>
     </header>
 
     <div class="container main-grid">
-        <!-- Sidebar -->
         <aside class="sidebar">
             <div class="sidebar-box">
                 <h3>Search Product</h3>
-                <input type="text" id="search-input" placeholder="Search products..." oninput="filterProducts()">
+                <input type="text" id="search-input" placeholder="Search products..." oninput="showProducts()">
             </div>
             <div class="sidebar-box">
                 <h3>Categories</h3>
-                <select id="category-filter" onchange="filterProducts()">
+                <select id="category-filter" onchange="showProducts()">
                     <option value="all">All Products</option>
-                    <option value="tools">Hand Tools</option>
-                    <option value="fasteners">Fasteners</option>
-                    <option value="supplies">Supplies</option>
                 </select>
             </div>
         </aside>
 
-        <!-- Products Grid -->
         <main class="products-area">
             <h2>Available Products</h2>
             <div class="product-grid" id="product-list">
-                <!-- Products will load here -->
+                <div style="grid-column:1/-1; text-align:center; padding:50px; color:#64748b;">
+                    <h3>No products available yet</h3>
+                    <p>Please wait for Admin to add items.</p>
+                </div>
             </div>
         </main>
     </div>
 
     <script src="js/customer-script.js"></script>
     <script>
-        const products = [
-            { id:1, name:"Screwdriver Set", price:250, stock:20, category:"tools", img:"🔧" },
-            { id:2, name:"Pliers", price:120, stock:35, category:"tools", img:"🗜" },
-            { id:3, name:"Hammer", price:180, stock:5, category:"tools", img:"🔨" },
-            { id:4, name:"Wrench", price:95, stock:2, category:"tools", img:"🔩" },
-            { id:5, name:"Nails (1kg)", price:85, stock:0, category:"fasteners", img:"📌" },
-            { id:6, name:"Paint Brush", price:65, stock:50, category:"supplies", img:"🖌" }
-        ];
-
-        function renderProducts(list) {
-            const container = document.getElementById('product-list');
-            container.innerHTML = '';
-            list.forEach(p => {
-                const stockClass = p.stock <= 0 ? 'out-stock' : p.stock <= 5 ? 'low-stock' : '';
-                const btnText = p.stock <= 0 ? 'Out of Stock' : 'Add to Cart';
-                const btnDis = p.stock <= 0 ? 'disabled' : '';
-
-                container.innerHTML += `
-                <div class="product-card ${stockClass}">
-                    <div class="prod-img">${p.img}</div>
-                    <h3>${p.name}</h3>
-                    <p class="price">₱ ${p.price.toFixed(2)}</p>
-                    <p class="stock-text">Stock: ${p.stock}</p>
-                    <button class="add-btn" ${btnDis} onclick="addToCart('${p.name}', ${p.price})">${btnText}</button>
-                </div>
-                `;
-            });
+        function getAdminProducts() {
+            return JSON.parse(localStorage.getItem('hardProducts')) || [];
         }
 
-        function filterProducts() {
+        function showProducts() {
+            const allProds = getAdminProducts();
             const search = document.getElementById('search-input').value.toLowerCase();
             const cat = document.getElementById('category-filter').value;
-            let filtered = products;
 
+            let filtered = allProds;
             if(cat !== 'all') filtered = filtered.filter(p => p.category === cat);
             if(search) filtered = filtered.filter(p => p.name.toLowerCase().includes(search));
 
-            renderProducts(filtered);
+            const container = document.getElementById('product-list');
+            if(allProds.length === 0 || filtered.length === 0) {
+                container.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:50px; color:#64748b;">
+                    <h3>${allProds.length === 0 ? 'No products yet' : 'No items found'}</h3>
+                    <p>${allProds.length === 0 ? 'Admin will add products soon.' : 'Try different search or category.'}</p>
+                </div>`;
+                updateCategoryFilter();
+                return;
+            }
+
+            container.innerHTML = '';
+            filtered.forEach(p => {
+                const isLow = p.stock > 0 && p.stock <= 5;
+                const isOut = p.stock <= 0;
+                container.innerHTML += `
+                <div class="product-card ${isOut ? 'out-stock' : isLow ? 'low-stock' : ''}">
+                    <div class="prod-img">📦</div>
+                    <h3>${p.name}</h3>
+                    <p class="price">₱ ${p.price.toFixed(2)}</p>
+                    <p class="stock-text">Stock: ${p.stock}</p>
+                    <button class="add-btn" ${isOut ? 'disabled' : ''} onclick="addToCart('${p.name}', ${p.price})">
+                        ${isOut ? 'Out of Stock' : 'Add to Cart'}
+                    </button>
+                </div>`;
+            });
+            updateCategoryFilter();
         }
 
-        function updateCartCount() {
-            const cart = JSON.parse(localStorage.getItem('hardsalesCart')) || [];
-            const total = cart.reduce((sum,item) => sum + item.qty, 0);
-            document.getElementById('cart-count').textContent = total;
-        }
-
-        function toggleTheme() {
-            document.body.classList.toggle('dark-mode');
-            localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+        function updateCategoryFilter() {
+            const allProds = getAdminProducts();
+            const select = document.getElementById('category-filter');
+            select.innerHTML = `<option value="all">All Products</option>`;
+            const cats = [...new Set(allProds.map(p => p.category))];
+            cats.forEach(c => select.innerHTML += `<option value="${c}">${c}</option>`);
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            renderProducts(products);
+            showProducts();
             updateCartCount();
-            if(localStorage.getItem('darkMode') === 'true') document.body.classList.add('dark-mode');
         });
     </script>
 </body>

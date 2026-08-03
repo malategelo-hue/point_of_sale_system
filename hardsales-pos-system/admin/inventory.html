@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory Control - HardSales</title>
+    <link rel="stylesheet" href="css/admin-style.css">
+    <style>
+        .inv-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px; }
+        .add-prod-btn { background: #16a34a; color: white; padding: 10px 18px; border-radius: 6px; border: none; cursor: pointer; font-size: 15px; }
+        .add-prod-btn:hover { background: #15803d; }
+        .stock-item { display: flex; align-items: center; justify-content: space-between; padding: 18px; background: white; border-radius: 8px; margin-bottom: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); flex-wrap: wrap; gap: 15px; }
+        .prod-info { line-height: 1.6; }
+        .prod-name { font-weight: bold; font-size: 16px; }
+        .prod-details { font-size: 14px; color: #64748b; }
+        .qty-group { display: flex; align-items: center; gap: 12px; }
+        .qty-btn { width: 36px; height: 36px; border: none; border-radius: 50%; background: #e2e8f0; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .qty-btn:hover { background: #cbd5e1; }
+        .delete-btn { background: #ef4444; color: white; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; }
+        .back-link { color: #475569; text-decoration: none; margin-bottom: 15px; display: inline-block; }
+        .empty-inv { text-align: center; padding: 50px 20px; color: #64748b; }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <a href="index.html" class="back-link">← Back to Dashboard</a>
+        
+        <div class="inv-header">
+            <div>
+                <h1>Inventory Control</h1>
+                <p>Only Admin can add and manage products</p>
+            </div>
+            <button class="add-prod-btn" onclick="addNewProduct()">+ Add New Product</button>
+            <button class="add-prod-btn" style="background:#f59e0b;" onclick="clearAllData()">🗑 Reset All Data</button>
+        </div>
+
+        <div id="stock-list"></div>
+    </div>
+
+    <script>
+        // WALANG LAMAN SA SIMULA - ADMIN LANG ANG MAGDADAGDAG
+        function loadInventory() {
+            const products = JSON.parse(localStorage.getItem('hardProducts')) || [];
+            const list = document.getElementById('stock-list');
+            list.innerHTML = '';
+
+            if(products.length === 0) {
+                list.innerHTML = `<div class="empty-inv"><h3>No products yet</h3><p>Click "Add New Product" to start adding items.</p></div>`;
+                return;
+            }
+
+            products.forEach((p, idx) => {
+                list.innerHTML += `
+                <div class="stock-item">
+                    <div class="prod-info">
+                        <div class="prod-name">${p.name}</div>
+                        <div class="prod-details">Category: ${p.category} | Price: ₱ ${p.price.toFixed(2)}</div>
+                    </div>
+                    <div class="qty-group">
+                        <button class="qty-btn" onclick="updateStock(${idx}, -1)">-</button>
+                        <span class="qty-val">${p.stock}</span>
+                        <button class="qty-btn" onclick="updateStock(${idx}, 1)">+</button>
+                        <button class="delete-btn" onclick="deleteProduct(${idx})">Delete</button>
+                    </div>
+                </div>`;
+            });
+        }
+
+        function updateStock(idx, change) {
+            let products = JSON.parse(localStorage.getItem('hardProducts')) || [];
+            products[idx].stock = Math.max(0, products[idx].stock + change);
+            localStorage.setItem('hardProducts', JSON.stringify(products));
+            loadInventory();
+        }
+
+        function deleteProduct(idx) {
+            if(!confirm('Delete this product?')) return;
+            let products = JSON.parse(localStorage.getItem('hardProducts')) || [];
+            products.splice(idx, 1);
+            localStorage.setItem('hardProducts', JSON.stringify(products));
+            loadInventory();
+        }
+
+        function addNewProduct() {
+            const name = prompt('Product Name:');
+            if(!name) return;
+            const category = prompt('Category:') || 'General';
+            const price = parseFloat(prompt('Price:'));
+            const stock = parseInt(prompt('Initial Stock:'));
+
+            if(isNaN(price) || isNaN(stock)) return alert('Enter valid numbers!');
+
+            let products = JSON.parse(localStorage.getItem('hardProducts')) || [];
+            products.push({
+                id: Date.now(),
+                name: name,
+                category: category,
+                price: price,
+                stock: stock
+            });
+            localStorage.setItem('hardProducts', JSON.stringify(products));
+            alert('✅ Product added! Will show up in customer shop.');
+            loadInventory();
+        }
+
+        function clearAllData() {
+            if(!confirm('⚠ Delete ALL products, orders, and sales data? This cannot be undone!')) return;
+            localStorage.removeItem('hardProducts');
+            localStorage.removeItem('hardSales');
+            localStorage.removeItem('custOrders');
+            localStorage.removeItem('refundRequests');
+            alert('✅ All data cleared! Start fresh now.');
+            loadInventory();
+        }
+
+        document.addEventListener('DOMContentLoaded', loadInventory);
+    </script>
+</body>
+</html>
