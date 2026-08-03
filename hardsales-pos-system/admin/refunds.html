@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Refund Requests - HardSales</title>
+    <link rel="stylesheet" href="css/admin-style.css">
+    <style>
+        .page-title { margin-bottom: 20px; }
+        .refund-card {
+            background: white; padding: 20px; margin-bottom: 15px;
+            border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .refund-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 10px; flex-wrap: wrap; gap: 8px;
+        }
+        .status-tag {
+            padding: 4px 10px; border-radius: 4px; font-size: 13px; font-weight: bold;
+        }
+        .pending { background: #fef3c7; color: #92400e; }
+        .approved { background: #dbeafe; color: #1e40af; }
+        .rejected { background: #fecaca; color: #991b1b; }
+        .refund-actions { margin-top: 12px; display: flex; gap: 10px; flex-wrap: wrap; }
+        .approve-btn {
+            background: #16a34a; color: white; border: none;
+            padding: 7px 15px; border-radius: 5px; cursor: pointer;
+        }
+        .reject-btn {
+            background: #ef4444; color: white; border: none;
+            padding: 7px 15px; border-radius: 5px; cursor: pointer;
+        }
+        .empty-state {
+            text-align: center; padding: 60px 20px; color: #64748b;
+        }
+    </style>
+</head>
+<body>
+    <div class="pos-container">
+        <header class="pos-header">
+            <h2>🔄 Refund Requests</h2>
+            <a href="index.html" class="logout-btn">← Back to Dashboard</a>
+        </header>
+
+        <h3 class="page-title">Customer Refund Requests</h3>
+        <div id="refund-list"></div>
+    </div>
+
+    <script src="js/admin-script.js"></script>
+    <script>
+        // Load and display all refund requests
+        function loadRefunds() {
+            const refunds = JSON.parse(localStorage.getItem('refundRequests')) || [];
+            const orders = JSON.parse(localStorage.getItem('custOrders')) || [];
+            const list = document.getElementById('refund-list');
+
+            if(refunds.length === 0) {
+                list.innerHTML = `
+                <div class="empty-state">
+                    <h3>No Refund Requests Yet</h3>
+                    <p>When customers request refunds, they will appear here.</p>
+                </div>`;
+                return;
+            }
+
+            list.innerHTML = '';
+            refunds.forEach((r, idx) => {
+                list.innerHTML += `
+                <div class="refund-card">
+                    <div class="refund-header">
+                        <div>
+                            <strong>Order #${r.orderId}</strong>
+                            <span style="margin:0 10px;">|</span>
+                            ${r.date}
+                        </div>
+                        <span class="status-tag ${r.status}">${r.status.toUpperCase()}</span>
+                    </div>
+                    <p><strong>Items:</strong> ${r.items.map(i => `${i.qty}x ${i.name}`).join(', ')}</p>
+                    <p><strong>Total Amount:</strong> ₱ ${r.total.toFixed(2)}</p>
+
+                    ${r.status === 'pending' ? `
+                    <div class="refund-actions">
+                        <button class="approve-btn" onclick="approveRefund(${idx}, ${r.orderId})">✅ Approve Refund</button>
+                        <button class="reject-btn" onclick="rejectRefund(${idx}, ${r.orderId})">❌ Reject Refund</button>
+                    </div>
+                    ` : ''}
+                </div>`;
+            });
+        }
+
+        // Approve Refund
+        function approveRefund(idx, orderId) {
+            if(!confirm('✅ Are you sure you want to APPROVE this refund?')) return;
+
+            // Update refund request status
+            let refunds = JSON.parse(localStorage.getItem('refundRequests')) || [];
+            refunds[idx].status = 'approved';
+            localStorage.setItem('refundRequests', JSON.stringify(refunds));
+
+            // Update customer order status
+            let orders = JSON.parse(localStorage.getItem('custOrders')) || [];
+            const order = orders.find(o => o.id === orderId);
+            if(order) {
+                order.refundStatus = 'approved';
+                order.status = 'Refunded';
+            }
+            localStorage.setItem('custOrders', JSON.stringify(orders));
+
+            alert('✅ Refund Approved! Customer will see the update.');
+            loadRefunds();
+        }
+
+        // Reject Refund
+        function rejectRefund(idx, orderId) {
+            if(!confirm('❌ Are you sure you want to REJECT this refund?')) return;
+
+            // Update refund request status
+            let refunds = JSON.parse(localStorage.getItem('refundRequests')) || [];
+            refunds[idx].status = 'rejected';
+            localStorage.setItem('refundRequests', JSON.stringify(refunds));
+
+            // Update customer order status
+            let orders = JSON.parse(localStorage.getItem('custOrders')) || [];
+            const order = orders.find(o => o.id === orderId);
+            if(order) order.refundStatus = 'rejected';
+            localStorage.setItem('custOrders', JSON.stringify(orders));
+
+            alert('❌ Refund Rejected! Customer will see the update.');
+            loadRefunds();
+        }
+
+        // Load on page open
+        document.addEventListener('DOMContentLoaded', loadRefunds);
+    </script>
+</body>
+</html>
