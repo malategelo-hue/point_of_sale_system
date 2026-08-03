@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POS Terminal - HardSales</title>
+    <link rel="stylesheet" href="css/admin-style.css">
+</head>
+<body>
+    <div class="pos-container">
+        <header class="pos-header">
+            <h2>🛠️ HardSales POS Terminal</h2>
+            <a href="index.html" class="logout-btn">← Back</a>
+        </header>
+
+        <div class="pos-grid">
+            <!-- Products List -->
+            <div class="products-area">
+                <h3>Available Hardware</h3>
+                <div class="product-buttons">
+                    <div class="prod-btn" onclick="addItem('Screwdriver Set', 250)">
+                        Screwdriver Set <br> ₱250
+                    </div>
+                    <div class="prod-btn" onclick="addItem('Pliers', 120)">
+                        Pliers <br> ₱120
+                    </div>
+                    <div class="prod-btn" onclick="addItem('Hammer', 180)">
+                        Hammer <br> ₱180
+                    </div>
+                    <div class="prod-btn" onclick="addItem('Wrench', 95)">
+                        Wrench <br> ₱95
+                    </div>
+                    <div class="prod-btn" onclick="addItem('Nails (1kg)', 85)">
+                        Nails (1kg) <br> ₱85
+                    </div>
+                    <div class="prod-btn" onclick="addItem('Paint Brush', 65)">
+                        Paint Brush <br> ₱65
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cart & Receipt -->
+            <div class="cart-area">
+                <h3>🛒 Sales Cart</h3>
+                <div id="cart-list"></div>
+                <div class="total-row">
+                    <strong>TOTAL: ₱ <span id="total-amount">0.00</span></strong>
+                </div>
+                <div class="action-buttons">
+                    <button class="btn clear" onclick="clearCart()">Clear All</button>
+                    <button class="btn pay" onclick="processPayment()">Payment</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/admin-script.js"></script>
+</body>
+</html>
