@@ -5,83 +5,44 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - HardSales</title>
     <link rel="stylesheet" href="css/admin-style.css">
-    <style>
-        .stats-row {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 15px; margin-bottom: 20px;
-        }
-        .stat-card {
-            background: white; padding: 20px; border-radius: 8px; text-align: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-        .stat-card h3 { font-size: 15px; color: #64748b; margin-bottom: 5px; }
-        .stat-card p { font-size: 26px; font-weight: bold; }
-        .low { color: #dc2626; }
-        .ok { color: #16a34a; }
-        .stock-table { width: 100%; background: white; border-radius: 8px; overflow: hidden; margin-top: 20px; }
-        .stock-table th, .stock-table td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
-        .stock-table th { background: #1e3a8a; color: white; }
-        .dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 25px; }
-        .dash-card { background: white; padding: 25px; text-align: center; border-radius: 8px; text-decoration: none; color: inherit; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-        .dash-card:hover { transform: translateY(-3px); }
-    </style>
 </head>
 <body>
     <div class="pos-container">
         <header class="pos-header">
-            <h2>👨💼 Admin Dashboard</h2>
+            <h2>📊 Admin Dashboard Overview</h2>
             <a href="../index.html" class="logout-btn" onclick="localStorage.clear()">Logout</a>
         </header>
 
-        <div class="stats-row">
+        <div class="stats-grid">
             <div class="stat-card">
-                <h3>Total Sales Today</h3>
-                <p>₱ 5,420.00</p>
+                <h3>Total Items Sold</h3>
+                <p id="stat-items">0</p>
             </div>
             <div class="stat-card">
-                <h3>Pending Orders</h3>
-                <p>4</p>
+                <h3>Total Sales</h3>
+                <p id="stat-sales">₱ 0.00</p>
             </div>
             <div class="stat-card">
-                <h3>Refund Requests</h3>
-                <p class="low">2</p>
+                <h3>Today's Transactions</h3>
+                <p id="stat-trans">0</p>
             </div>
             <div class="stat-card">
-                <h3>Low Stock Items</h3>
-                <p class="low">3</p>
+                <h3>Total Products</h3>
+                <p id="stat-prod">0</p>
             </div>
         </div>
 
-        <h3>📦 Current Stock Status</h3>
+        <h3>📦 Stock Status</h3>
         <table class="stock-table">
             <thead>
                 <tr>
                     <th>Product Name</th>
                     <th>Price</th>
-                    <th>Remaining Stock</th>
+                    <th>Stock</th>
                     <th>Status</th>
                 </tr>
             </thead>
-            <tbody>
-                <tr>
-                    <td>Screwdriver Set</td>
-                    <td>₱ 250.00</td>
-                    <td>45</td>
-                    <td class="ok">Good</td>
-                </tr>
-                <tr>
-                    <td>Hammer</td>
-                    <td>₱ 180.00</td>
-                    <td>8</td>
-                    <td class="low">Low Stock!</td>
-                </tr>
-                <tr>
-                    <td>Wrench</td>
-                    <td>₱ 95.00</td>
-                    <td>3</td>
-                    <td class="low">Critical!</td>
-                </tr>
-            </tbody>
+            <tbody id="stock-body"></tbody>
         </table>
 
         <div class="dashboard">
@@ -91,5 +52,45 @@
             <a href="refunds.html" class="dash-card"><h3>🔄 Refund Requests</h3></a>
         </div>
     </div>
+
+    <script src="js/admin-script.js"></script>
+    <script>
+        function loadDashboard() {
+            const sales = JSON.parse(localStorage.getItem('hardSales')) || [];
+            const products = JSON.parse(localStorage.getItem('hardProducts')) || [];
+
+            let totalItems = 0;
+            let totalSales = 0;
+            sales.forEach(t => {
+                totalItems += t.items.length;
+                totalSales += t.total;
+            });
+
+            document.getElementById('stat-items').textContent = totalItems;
+            document.getElementById('stat-sales').textContent = `₱ ${totalSales.toFixed(2)}`;
+            document.getElementById('stat-trans').textContent = sales.length;
+            document.getElementById('stat-prod').textContent = products.length;
+
+            const body = document.getElementById('stock-body');
+            body.innerHTML = '';
+            products.forEach(p => {
+                let status = 'Good';
+                let cls = 'ok';
+                if(p.stock <= 0) { status = 'Out of Stock'; cls = 'out'; }
+                else if(p.stock <= 5) { status = 'Low Stock'; cls = 'low'; }
+
+                body.innerHTML += `
+                <tr>
+                    <td>${p.name}</td>
+                    <td>₱ ${p.price.toFixed(2)}</td>
+                    <td>${p.stock}</td>
+                    <td class="${cls}">${status}</td>
+                </tr>
+                `;
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', loadDashboard);
+    </script>
 </body>
 </html>

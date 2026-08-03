@@ -3,51 +3,108 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Products - HardSales</title>
+    <title>Shop - HardSales</title>
     <link rel="stylesheet" href="css/customer-style.css">
 </head>
 <body>
+    <!-- Header -->
     <header class="cust-header">
         <div class="container">
-            <h1>🛠️ HardSales Hardware Store</h1>
-            <a href="../index.html" class="back-link">← Back to Main</a>
+            <h1>🛠 HardSales Hardware Store</h1>
+            <div class="header-actions">
+                <a href="cart.html" class="cart-link">🛒 My Cart <span id="cart-count">0</span></a>
+                <a href="orders.html" class="cart-link">📋 My Orders</a>
+                <button class="theme-btn" onclick="toggleTheme()">🌙</button>
+                <a href="../index.html" class="logout-link">Logout</a>
+            </div>
         </div>
     </header>
 
-    <div class="container">
-        <h2 class="section-title">Available Products</h2>
-        <div class="product-grid">
-            <div class="product-card">
-                <h3>Screwdriver Set</h3>
-                <p class="price">₱ 250.00</p>
-                <p>Complete set of standard screwdrivers</p>
+    <div class="container main-grid">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-box">
+                <h3>Search Product</h3>
+                <input type="text" id="search-input" placeholder="Search products..." oninput="filterProducts()">
             </div>
-            <div class="product-card">
-                <h3>Pliers</h3>
-                <p class="price">₱ 120.00</p>
-                <p>Heavy duty combination pliers</p>
+            <div class="sidebar-box">
+                <h3>Categories</h3>
+                <select id="category-filter" onchange="filterProducts()">
+                    <option value="all">All Products</option>
+                    <option value="tools">Hand Tools</option>
+                    <option value="fasteners">Fasteners</option>
+                    <option value="supplies">Supplies</option>
+                </select>
             </div>
-            <div class="product-card">
-                <h3>Hammer</h3>
-                <p class="price">₱ 180.00</p>
-                <p>Steel claw hammer</p>
+        </aside>
+
+        <!-- Products Grid -->
+        <main class="products-area">
+            <h2>Available Products</h2>
+            <div class="product-grid" id="product-list">
+                <!-- Products will load here -->
             </div>
-            <div class="product-card">
-                <h3>Wrench</h3>
-                <p class="price">₱ 95.00</p>
-                <p>Adjustable wrench</p>
-            </div>
-            <div class="product-card">
-                <h3>Nails (1kg)</h3>
-                <p class="price">₱ 85.00</p>
-                <p>Assorted sizes construction nails</p>
-            </div>
-            <div class="product-card">
-                <h3>Paint Brush</h3>
-                <p class="price">₱ 65.00</p>
-                <p>All purpose paint brush</p>
-            </div>
-        </div>
+        </main>
     </div>
+
+    <script src="js/customer-script.js"></script>
+    <script>
+        const products = [
+            { id:1, name:"Screwdriver Set", price:250, stock:20, category:"tools", img:"🔧" },
+            { id:2, name:"Pliers", price:120, stock:35, category:"tools", img:"🗜" },
+            { id:3, name:"Hammer", price:180, stock:5, category:"tools", img:"🔨" },
+            { id:4, name:"Wrench", price:95, stock:2, category:"tools", img:"🔩" },
+            { id:5, name:"Nails (1kg)", price:85, stock:0, category:"fasteners", img:"📌" },
+            { id:6, name:"Paint Brush", price:65, stock:50, category:"supplies", img:"🖌" }
+        ];
+
+        function renderProducts(list) {
+            const container = document.getElementById('product-list');
+            container.innerHTML = '';
+            list.forEach(p => {
+                const stockClass = p.stock <= 0 ? 'out-stock' : p.stock <= 5 ? 'low-stock' : '';
+                const btnText = p.stock <= 0 ? 'Out of Stock' : 'Add to Cart';
+                const btnDis = p.stock <= 0 ? 'disabled' : '';
+
+                container.innerHTML += `
+                <div class="product-card ${stockClass}">
+                    <div class="prod-img">${p.img}</div>
+                    <h3>${p.name}</h3>
+                    <p class="price">₱ ${p.price.toFixed(2)}</p>
+                    <p class="stock-text">Stock: ${p.stock}</p>
+                    <button class="add-btn" ${btnDis} onclick="addToCart('${p.name}', ${p.price})">${btnText}</button>
+                </div>
+                `;
+            });
+        }
+
+        function filterProducts() {
+            const search = document.getElementById('search-input').value.toLowerCase();
+            const cat = document.getElementById('category-filter').value;
+            let filtered = products;
+
+            if(cat !== 'all') filtered = filtered.filter(p => p.category === cat);
+            if(search) filtered = filtered.filter(p => p.name.toLowerCase().includes(search));
+
+            renderProducts(filtered);
+        }
+
+        function updateCartCount() {
+            const cart = JSON.parse(localStorage.getItem('hardsalesCart')) || [];
+            const total = cart.reduce((sum,item) => sum + item.qty, 0);
+            document.getElementById('cart-count').textContent = total;
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderProducts(products);
+            updateCartCount();
+            if(localStorage.getItem('darkMode') === 'true') document.body.classList.add('dark-mode');
+        });
+    </script>
 </body>
 </html>
