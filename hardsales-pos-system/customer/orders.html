@@ -6,62 +6,85 @@
     <title>My Orders - HardSales</title>
     <link rel="stylesheet" href="css/customer-style.css">
     <style>
-        .order-card {
-            background: white; padding: 18px; margin-bottom: 15px; border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        .order-header { display: flex; justify-content: space-between; margin-bottom: 10px; }
-        .status { padding: 3px 8px; border-radius: 4px; font-size: 13px; font-weight: bold; }
+        .order-card { background: white; padding: 20px; margin-bottom: 15px; border-radius: 8px; }
+        .status { padding: 4px 10px; border-radius: 4px; font-weight: bold; font-size: 13px; }
         .paid { background: #bbf7d0; color: #166534; }
-        .refund { background: #fecaca; color: #991b1b; }
-        .receipt-btn { background: #3b82f6; color: white; border: none; padding: 6px 10px; border-radius: 4px; margin-right: 5px; cursor: pointer; }
-        .refund-btn { background: #ef4444; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; }
+        .pending { background: #fef3c7; color: #92400e; }
+        .approved { background: #dbeafe; color: #1e40af; }
+        .rejected { background: #fecaca; color: #991b1b; }
+        .btn-group { margin-top: 12px; display: flex; gap: 8px; }
+        .refund-btn { background: #ef4444; color: white; border: none; padding: 7px 12px; border-radius: 5px; cursor: pointer; }
+        .refund-btn:disabled { background: #9ca3af; cursor: not-allowed; }
     </style>
 </head>
 <body>
     <header class="cust-header">
         <div class="container">
-            <h1>🛠️ My Orders & History</h1>
+            <h1>📋 My Orders</h1>
             <a href="index.html" class="back-link">← Back to Shop</a>
         </div>
     </header>
 
     <div class="container">
-        <div class="order-card">
-            <div class="order-header">
-                <span>Order #20260803-001 | Aug 3, 2026 2:30 PM</span>
-                <span class="status paid">Completed</span>
-            </div>
-            <p><strong>Items:</strong> 1x Screwdriver Set, 2x Pliers</p>
-            <p><strong>Total:</strong> ₱ 490.00</p>
-            <br>
-            <button class="receipt-btn" onclick="showReceipt()">📄 View Receipt</button>
-            <button class="refund-btn" onclick="requestRefund()">🔄 Request Refund</button>
-        </div>
+        <div id="orders-list"></div>
     </div>
 
     <script>
-        function showReceipt() {
-            alert(`
-============= RECEIPT =============
-HardSales Hardware Store
-Order #20260803-001
-Date: Aug 3, 2026 2:30 PM
+        function loadOrders() {
+            const orders = JSON.parse(localStorage.getItem('custOrders')) || [];
+            const list = document.getElementById('orders-list');
 
-1x Screwdriver Set  ₱ 250.00
-2x Pliers           ₱ 240.00
------------------------------------
-TOTAL:              ₱ 490.00
-Status: Paid & Delivered
-===================================
-Thank you for buying!
-            `);
-        }
-        function requestRefund() {
-            if(confirm('Gusto mo ba talagang humiling ng refund para sa order na ito?')) {
-                alert('Refund request sent! Hihintayin ang pag-apruba ng Admin.');
+            if(orders.length === 0) {
+                list.innerHTML = `<p style="text-align:center; padding:40px;">You have no orders yet.</p>`;
+                return;
             }
+
+            list.innerHTML = '';
+            orders.forEach((order, idx) => {
+                let statusClass = 'paid';
+                let statusText = 'Paid';
+                if(order.refundStatus === 'pending') { statusClass = 'pending'; statusText = 'Refund Pending'; }
+                if(order.refundStatus === 'approved') { statusClass = 'approved'; statusText = 'Refund Approved'; }
+                if(order.refundStatus === 'rejected') { statusClass = 'rejected'; statusText = 'Refund Rejected'; }
+
+                list.innerHTML += `
+                <div class="order-card">
+                    <p><strong>Order #${order.id}</strong> | ${order.date}</p>
+                    <p>Items: ${order.items.map(i => `${i.qty}x ${i.name}`).join(', ')}</p>
+                    <p>Total: ₱ ${order.total.toFixed(2)}</p>
+                    <span class="status ${statusClass}">${statusText}</span>
+                    <div class="btn-group">
+                        <button class="refund-btn" ${order.refundStatus ? 'disabled' : ''} onclick="sendRefund(${idx})">
+                            ${order.refundStatus ? 'Request Sent' : 'Request Refund'}
+                        </button>
+                    </div>
+                </div>`;
+            });
         }
+
+        function sendRefund(idx) {
+            if(!confirm('Send refund request to Admin?')) return;
+
+            let orders = JSON.parse(localStorage.getItem('custOrders')) || [];
+            orders[idx].refundStatus = 'pending';
+            localStorage.setItem('custOrders', JSON.stringify(orders));
+
+            // I-save mismo sa listahan na binabasa ng Admin
+            let allRefunds = JSON.parse(localStorage.getItem('refundRequests')) || [];
+            allRefunds.unshift({
+                orderId: orders[idx].id,
+                date: orders[idx].date,
+                total: orders[idx].total,
+                items: orders[idx].items,
+                status: 'pending'
+            });
+            localStorage.setItem('refundRequests', JSON.stringify(allRefunds));
+
+            alert('✅ Refund request sent! Admin will review it.');
+            loadOrders();
+        }
+
+        document.addEventListener('DOMContentLoaded', loadOrders);
     </script>
 </body>
 </html>
