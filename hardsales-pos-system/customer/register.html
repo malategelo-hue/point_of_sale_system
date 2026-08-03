@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Customer Login - HardSales</title>
+    <title>Create Account - HardSales</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
         body {
             background: linear-gradient(135deg, #15803d, #22c55e);
             height: 100vh; display: flex; align-items: center; justify-content: center;
         }
-        .login-box {
-            background: white; padding: 35px 25px; border-radius: 12px; width: 100%; max-width: 380px;
+        .reg-box {
+            background: white; padding: 30px 25px; border-radius: 12px; width: 100%; max-width: 380px;
         }
-        .login-box h2 { text-align: center; color: #15803d; margin-bottom: 20px; }
+        .reg-box h2 { text-align: center; color: #15803d; margin-bottom: 20px; }
         .input-group { margin-bottom: 15px; }
         .input-group label { display: block; margin-bottom: 5px; font-weight: bold; }
         .input-group input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
@@ -23,42 +23,44 @@
     </style>
 </head>
 <body>
-    <div class="login-box">
-        <h2>Customer Login</h2>
-        <form onsubmit="custLogin(event)">
+    <div class="reg-box">
+        <h2>Create Customer Account</h2>
+        <form onsubmit="createAcc(event)">
+            <div class="input-group">
+                <label>Full Name</label>
+                <input type="text" id="fullname" required>
+            </div>
             <div class="input-group">
                 <label>Username / Email</label>
-                <input type="text" id="cust-user" required>
+                <input type="text" id="new-user" required>
             </div>
             <div class="input-group">
                 <label>Password</label>
-                <input type="password" id="cust-pass" required>
+                <input type="password" id="new-pass" required>
             </div>
-            <button type="submit" class="btn">Sign In</button>
+            <button type="submit" class="btn">Register</button>
         </form>
         <div class="link">
-            <a href="../index.html">← Back</a> |
-            <a href="register.html">Create Account</a>
+            <a href="login.html">← Back to Login</a>
         </div>
     </div>
 
     <script>
-        function custLogin(e) {
+        function createAcc(e) {
             e.preventDefault();
-            const user = document.getElementById('cust-user').value;
-            const pass = document.getElementById('cust-pass').value;
+            const name = document.getElementById('fullname').value;
+            const user = document.getElementById('new-user').value;
+            const pass = document.getElementById('new-pass').value;
 
             let accounts = JSON.parse(localStorage.getItem('custAccounts')) || [];
-            const found = accounts.find(a => a.username === user && a.password === pass);
+            const exist = accounts.find(a => a.username === user);
+            if(exist) return alert('Username already taken!');
 
-            if(found) {
-                localStorage.setItem('custName', found.name);
-                localStorage.setItem('loggedUser', found.username);
-                alert(`Welcome ${found.name}!`);
-                window.location.href = "index.html";
-            } else {
-                alert('Account does not exist or wrong password!');
-            }
+            accounts.push({ name, username: user, password: pass });
+            localStorage.setItem('custAccounts', JSON.stringify(accounts));
+            
+            alert('Account created successfully! Please login.');
+            window.location.href = 'login.html';
         }
     </script>
 </body>

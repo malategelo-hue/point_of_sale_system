@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Orders - HardSales</title>
+    <link rel="stylesheet" href="css/customer-style.css">
+    <style>
+        .order-card {
+            background: white; padding: 18px; margin-bottom: 15px; border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .order-header { display: flex; justify-content: space-between; margin-bottom: 10px; }
+        .status { padding: 3px 8px; border-radius: 4px; font-size: 13px; font-weight: bold; }
+        .paid { background: #bbf7d0; color: #166534; }
+        .refund { background: #fecaca; color: #991b1b; }
+        .receipt-btn { background: #3b82f6; color: white; border: none; padding: 6px 10px; border-radius: 4px; margin-right: 5px; cursor: pointer; }
+        .refund-btn { background: #ef4444; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <header class="cust-header">
+        <div class="container">
+            <h1>🛠️ My Orders & History</h1>
+            <a href="index.html" class="back-link">← Back to Shop</a>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="order-card">
+            <div class="order-header">
+                <span>Order #20260803-001 | Aug 3, 2026 2:30 PM</span>
+                <span class="status paid">Completed</span>
+            </div>
+            <p><strong>Items:</strong> 1x Screwdriver Set, 2x Pliers</p>
+            <p><strong>Total:</strong> ₱ 490.00</p>
+            <br>
+            <button class="receipt-btn" onclick="showReceipt()">📄 View Receipt</button>
+            <button class="refund-btn" onclick="requestRefund()">🔄 Request Refund</button>
+        </div>
+    </div>
+
+    <script>
+        function showReceipt() {
+            alert(`
+============= RECEIPT =============
+HardSales Hardware Store
+Order #20260803-001
+Date: Aug 3, 2026 2:30 PM
+
+1x Screwdriver Set  ₱ 250.00
+2x Pliers           ₱ 240.00
+-----------------------------------
+TOTAL:              ₱ 490.00
+Status: Paid & Delivered
+===================================
+Thank you for buying!
+            `);
+        }
+        function requestRefund() {
+            if(confirm('Gusto mo ba talagang humiling ng refund para sa order na ito?')) {
+                alert('Refund request sent! Hihintayin ang pag-apruba ng Admin.');
+            }
+        }
+    </script>
+</body>
+</html>
