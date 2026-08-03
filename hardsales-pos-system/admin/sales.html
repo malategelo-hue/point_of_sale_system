@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales Report - HardSales</title>
+    <link rel="stylesheet" href="css/admin-style.css">
+    <style>
+        .summary-box {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px; margin-bottom: 20px;
+        }
+        .sum-card {
+            background: white; padding: 20px; border-radius: 8px; text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .sum-card h3 { font-size: 16px; color: #64748b; margin-bottom: 5px; }
+        .sum-card p { font-size: 24px; font-weight: bold; color: #1e40af; }
+        .sales-table { width: 100%; background: white; border-radius: 8px; overflow: hidden; }
+        .sales-table th, .sales-table td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+        .sales-table th { background: #1e3a8a; color: white; }
+        .print-btn {
+            background: #f59e0b; color: white; border: none; padding: 10px 20px;
+            border-radius: 6px; cursor: pointer; margin-bottom: 15px;
+        }
+        .print-btn:hover { background: #d97706; }
+    </style>
+</head>
+<body>
+    <div class="pos-container">
+        <header class="pos-header">
+            <h2>📊 Sales Report</h2>
+            <a href="index.html" class="logout-btn">← Back</a>
+        </header>
+
+        <!-- Summary Cards -->
+        <div class="summary-box">
+            <div class="sum-card">
+                <h3>Total Sales Today</h3>
+                <p>₱ 2,480.00</p>
+            </div>
+            <div class="sum-card">
+                <h3>Total Transactions</h3>
+                <p>12</p>
+            </div>
+            <div class="sum-card">
+                <h3>Top Product</h3>
+                <p>Hammer</p>
+            </div>
+        </div>
+
+        <button class="print-btn" onclick="window.print()">🖨️ Print Report</button>
+
+        <!-- Sales List -->
+        <table class="sales-table">
+            <thead>
+                <tr>
+                    <th>Date & Time</th>
+                    <th>Items</th>
+                    <th>Total Amount</th>
+                    <th>Cashier</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>2026-08-03 08:15 AM</td>
+                    <td>2x Hammer, 1x Pliers</td>
+                    <td>₱ 480.00</td>
+                    <td>Admin</td>
+                </tr>
+                <tr>
+                    <td>2026-08-03 10:30 AM</td>
+                    <td>1x Screwdriver Set, 5x Nails</td>
+                    <td>₱ 675.00</td>
+                    <td>Admin</td>
+                </tr>
+                <tr>
+                    <td>2026-08-03 01:45 PM</td>
+                    <td>3x Wrench, 2x Paint Brush</td>
+                    <td>₱ 415.00</td>
+                    <td>Admin</td>
+                </tr>
+                <tr>
+                    <td>2026-08-03 03:20 PM</td>
+                    <td>5x Pliers, 2x Hammer</td>
+                    <td>₱ 910.00</td>
+                    <td>Admin</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

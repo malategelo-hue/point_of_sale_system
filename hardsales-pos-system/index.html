@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - HardSales POS System</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+        body {
+            background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+            height: 100vh; display: flex; align-items: center; justify-content: center;
+        }
+        .login-box {
+            background: white; padding: 40px 30px; border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2); width: 100%; max-width: 400px;
+        }
+        .login-box h1 { text-align: center; color: #1e3a8a; margin-bottom: 30px; }
+        .input-group { margin-bottom: 20px; }
+        .input-group label { display: block; margin-bottom: 8px; font-weight: bold; color: #374151; }
+        .input-group input {
+            width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 16px;
+        }
+        .btn {
+            width: 100%; padding: 12px; background: #16a34a; color: white; border: none;
+            border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px;
+        }
+        .btn:hover { background: #15803d; }
+        .link { text-align: center; margin-top: 15px; }
+        .link a { color: #1e40af; text-decoration: none; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="login-box">
+        <h1>🛠️ HardSales POS</h1>
+        <form onsubmit="login(event)">
+            <div class="input-group">
+                <label>Username</label>
+                <input type="text" id="username" placeholder="Enter username" required>
+            </div>
+            <div class="input-group">
+                <label>Password</label>
+                <input type="password" id="password" placeholder="Enter password" required>
+            </div>
+            <button type="submit" class="btn">Login as Admin</button>
+        </form>
+        <div class="link">
+            <a href="customer/index.html">View Products as Customer</a>
+        </div>
+    </div>
+
+    <script>
+        function login(e) {
+            e.preventDefault();
+            const user = document.getElementById('username').value;
+            const pass = document.getElementById('password').value;
+            
+            if(user === "admin" && pass === "admin123") {
+                alert("Login Successful! Welcome Admin");
+                window.location.href = "admin/index.html";
+            } else {
+                alert("Incorrect Username or Password!");
+            }
+        }
+    </script>
+</body>
+</html>

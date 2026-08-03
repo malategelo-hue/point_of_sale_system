@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory - HardSales</title>
+    <link rel="stylesheet" href="css/admin-style.css">
+    <style>
+        .inv-form {
+            background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px;
+            display: grid; grid-template-columns: 2fr 1fr 1fr 100px; gap: 10px;
+        }
+        .inv-form input { padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
+        .inv-table { width: 100%; background: white; border-radius: 8px; overflow: hidden; }
+        .inv-table th, .inv-table td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+        .inv-table th { background: #1e3a8a; color: white; }
+        .del-btn { background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="pos-container">
+        <header class="pos-header">
+            <h2>📦 Product Inventory</h2>
+            <a href="index.html" class="logout-btn">← Back</a>
+        </header>
+
+        <!-- Add Product Form -->
+        <div class="inv-form">
+            <input type="text" id="prod-name" placeholder="Product Name">
+            <input type="number" id="prod-price" placeholder="Price">
+            <input type="number" id="prod-stock" placeholder="Stock">
+            <button class="btn" style="background:#16a34a;" onclick="addProduct()">Add</button>
+        </div>
+
+        <!-- Inventory Table -->
+        <table class="inv-table">
+            <thead>
+                <tr>
+                    <th>Product Name</th>
+                    <th>Price</th>
+                    <th>Stock</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="inv-list">
+                <tr>
+                    <td>Screwdriver Set</td>
+                    <td>₱250.00</td>
+                    <td>20</td>
+                    <td><button class="del-btn">Delete</button></td>
+                </tr>
+                <tr>
+                    <td>Pliers</td>
+                    <td>₱120.00</td>
+                    <td>35</td>
+                    <td><button class="del-btn">Delete</button></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        function addProduct() {
+            const name = document.getElementById('prod-name').value;
+            const price = document.getElementById('prod-price').value;
+            const stock = document.getElementById('prod-stock').value;
+
+            if(!name || !price || !stock) return alert('Punan lahat ng patlang!');
+
+            const list = document.getElementById('inv-list');
+            list.innerHTML += `
+                <tr>
+                    <td>${name}</td>
+                    <td>₱${parseFloat(price).toFixed(2)}</td>
+                    <td>${stock}</td>
+                    <td><button class="del-btn" onclick="this.parentElement.parentElement.remove()">Delete</button></td>
+                </tr>
+            `;
+
+            // Clear inputs
+            document.getElementById('prod-name').value = '';
+            document.getElementById('prod-price').value = '';
+            document.getElementById('prod-stock').value = '';
+        }
+    </script>
+</body>
+</html>
